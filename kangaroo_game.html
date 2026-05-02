@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Kangaroo Math 2023 — Pre-Ecolier</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;overflow-x:hidden}
+body{background:linear-gradient(180deg,#87CEEB 0%,#87CEEB 55%,#4CAF50 55%,#4CAF50 100%);min-height:100vh;padding:0 0 40px}
+
+/* ── HEADER ── */
+.hdr{margin:0 auto;max-width:700px;padding:0 12px}
+.hdr-card{background:linear-gradient(135deg,#FF6B6B,#FF8E53);border-radius:0 0 28px 28px;padding:18px 24px 22px;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,0.2)}
+.hdr-title{font-size:26px;font-weight:900;color:#fff;text-shadow:2px 2px 4px rgba(0,0,0,0.2);letter-spacing:1px}
+.hdr-sub{font-size:14px;color:rgba(255,255,255,0.9);margin-top:4px}
+.hdr-sub-ar{direction:rtl;font-size:13px;color:rgba(255,255,255,0.85);margin-top:2px}
+
+/* ── STATS BAR ── */
+.stats-wrap{max-width:700px;margin:14px auto 0;padding:0 12px}
+.stats-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.stat-pill{background:#fff;border-radius:50px;padding:8px 20px;display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;box-shadow:0 3px 10px rgba(0,0,0,0.15)}
+.stat-pill.qnum{border:2px solid #a78bfa;color:#6d28d9}
+.stat-pill.wrong{border:2px solid #f87171;color:#dc2626}
+.stat-pill.right{border:2px solid #4ade80;color:#16a34a}
+.stat-icon{font-size:18px}
+
+/* ── PROGRESS BAR ── */
+.prog-wrap{max-width:700px;margin:12px auto 0;padding:0 12px}
+.prog-track{height:14px;background:rgba(255,255,255,0.4);border-radius:10px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#FF6B6B,#FF8E53);border-radius:10px;transition:width .5s ease;width:0%}
+
+/* ── QUESTION CARD ── */
+.qcard-wrap{max-width:700px;margin:16px auto 0;padding:0 12px}
+.qcard{background:#fff;border-radius:24px;padding:28px 24px 24px;box-shadow:0 8px 30px rgba(0,0,0,0.15)}
+.section-tag{display:inline-block;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;font-size:11px;font-weight:700;padding:4px 14px;border-radius:20px;margin-bottom:12px;letter-spacing:.5px;text-transform:uppercase}
+.q-counter{font-size:13px;color:#888;margin-bottom:6px;text-align:center}
+.q-text-en{font-size:17px;font-weight:700;color:#6d28d9;text-align:center;line-height:1.5;margin-bottom:6px}
+.q-text-ar{font-size:15px;color:#555;direction:rtl;text-align:center;line-height:1.6;margin-bottom:16px;border-top:1px dashed #e5e7eb;padding-top:10px}
+.q-fig{text-align:center;margin:10px 0 20px}
+.q-fig img{max-width:100%;max-height:260px;border-radius:14px;object-fit:contain}
+
+/* ── ANSWER BUTTONS ── */
+.opts-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+.opt-btn{background:linear-gradient(135deg,#5B5BD6,#7C3AED);border:none;border-radius:16px;padding:16px 12px;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:8px;min-height:64px;box-shadow:0 4px 12px rgba(91,91,214,0.35)}
+.opt-btn:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(91,91,214,0.45)}
+.opt-btn:active{transform:translateY(0)}
+.opt-btn .lbl{font-size:18px;font-weight:800;color:#fff}
+.opt-btn .lbl-img{max-height:90px;max-width:100%;border-radius:8px;object-fit:contain}
+.opt-btn.correct{background:linear-gradient(135deg,#16a34a,#22c55e)!important;box-shadow:0 4px 16px rgba(22,163,74,0.5)!important;animation:pulse-green .4s ease}
+.opt-btn.wrong{background:linear-gradient(135deg,#dc2626,#ef4444)!important;box-shadow:0 4px 16px rgba(220,38,38,0.5)!important;animation:shake .3s ease}
+.opt-btn.reveal{background:linear-gradient(135deg,#16a34a,#22c55e)!important;opacity:0.75}
+.opt-btn:disabled{cursor:default;transform:none!important}
+
+@keyframes pulse-green{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+@keyframes shake{0%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}100%{transform:translateX(0)}}
+
+/* ── FEEDBACK ── */
+.feedback{margin-top:14px;padding:12px 16px;border-radius:12px;font-size:14px;line-height:1.5;display:none;text-align:center}
+.feedback.ok{background:#dcfce7;color:#15803d;border:1.5px solid #86efac;display:block}
+.feedback.no{background:#fee2e2;color:#b91c1c;border:1.5px solid #fca5a5;display:block}
+
+/* ── NAV BUTTONS ── */
+.nav-wrap{max-width:700px;margin:14px auto 0;padding:0 12px;display:flex;gap:10px}
+.nav-btn{flex:1;padding:14px;border:none;border-radius:16px;font-size:16px;font-weight:800;cursor:pointer;transition:all .2s}
+.btn-next{background:linear-gradient(135deg,#FF6B6B,#FF8E53);color:#fff;box-shadow:0 4px 14px rgba(255,107,107,0.4)}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(255,107,107,0.5)}
+.btn-prev{background:#fff;color:#6d28d9;border:2px solid #c4b5fd;}
+.btn-prev:hover{background:#f5f3ff}
+
+/* ── RESULT SCREEN ── */
+.result-screen{display:none;max-width:700px;margin:20px auto;padding:0 12px}
+.result-card{background:#fff;border-radius:24px;padding:36px 24px;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,0.15)}
+.result-trophy{font-size:72px;margin-bottom:12px}
+.result-score{font-size:52px;font-weight:900;color:#6d28d9;margin:8px 0}
+.result-msg{font-size:18px;color:#555;margin-bottom:20px}
+.result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}
+.result-box{background:#f5f3ff;border-radius:14px;padding:16px 8px}
+.result-box-n{font-size:26px;font-weight:900;color:#6d28d9}
+.result-box-l{font-size:12px;color:#888;margin-top:4px}
+.btn-retry{background:linear-gradient(135deg,#FF6B6B,#FF8E53);color:#fff;border:none;border-radius:16px;padding:16px 40px;font-size:17px;font-weight:800;cursor:pointer;margin-top:10px;box-shadow:0 4px 14px rgba(255,107,107,0.4)}
+.btn-retry:hover{transform:translateY(-2px)}
+
+/* ── START SCREEN ── */
+.start-screen{max-width:700px;margin:20px auto;padding:0 12px}
+.start-card{background:#fff;border-radius:24px;padding:36px 24px;text-align:center;box-shadow:0 8px 30px rgba(0,0,0,0.15)}
+.start-title{font-size:22px;font-weight:900;color:#6d28d9;margin-bottom:8px}
+.start-sub{font-size:14px;color:#888;margin-bottom:24px}
+.start-info{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px}
+.start-info-box{background:#f5f3ff;border-radius:14px;padding:16px 8px}
+.start-info-n{font-size:24px;font-weight:900;color:#6d28d9}
+.start-info-l{font-size:12px;color:#888;margin-top:4px}
+.btn-start{background:linear-gradient(135deg,#5B5BD6,#7C3AED);color:#fff;border:none;border-radius:16px;padding:18px 48px;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(91,91,214,0.4)}
+.btn-start:hover{transform:translateY(-2px)}
+
+@media(max-width:480px){
+  .hdr-title{font-size:20px}
+  .q-text-en{font-size:15px}
+  .opts-grid{gap:8px}
+  .opt-btn{min-height:56px;padding:12px 8px}
+  .opt-btn .lbl{font-size:15px}
+  .result-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-card">
+    <div class="hdr-title">🦘 Kangaroo Math 2023</div>
+    <div class="hdr-sub">Pre-Ecolier — Class 1 &amp; 2</div>
+    <div class="hdr-sub-ar">المستوى التمهيدي — الصف الأول والثاني</div>
+  </div>
+</div>
+
+<!-- START SCREEN -->
+<div class="start-screen" id="startScreen">
+  <div class="start-card">
+    <div class="start-title">🎯 Ready to start? / هل أنت مستعد؟</div>
+    <div class="start-sub">International Kangaroo Mathematics Contest 2023<br>المسابقة الدولية الـ 33 لـكانجارو الرياضيات 2023</div>
+    <div class="start-info">
+      <div class="start-info-box"><div class="start-info-n">24</div><div class="start-info-l">Questions / سؤال</div></div>
+      <div class="start-info-box"><div class="start-info-n">3</div><div class="start-info-l">Sections / أقسام</div></div>
+      <div class="start-info-box"><div class="start-info-n">96</div><div class="start-info-l">Max Points / نقطة</div></div>
+    </div>
+    <button class="btn-start" onclick="startExam()">🚀 Start Exam / ابدأ الاختبار</button>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-wrap" id="statsWrap" style="display:none">
+  <div class="stats-row">
+    <div class="stat-pill qnum"><span class="stat-icon">📋</span><span id="statQ">سؤال: 1/24</span></div>
+    <div class="stat-pill wrong"><span class="stat-icon">❌</span><span id="statW">خطأ: 0</span></div>
+    <div class="stat-pill right"><span class="stat-icon">✅</span><span id="statR">صح: 0</span></div>
+  </div>
+</div>
+
+<!-- PROGRESS BAR -->
+<div class="prog-wrap" id="progWrap" style="display:none">
+  <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+</div>
+
+<!-- QUESTION CARD -->
+<div class="qcard-wrap" id="qcardWrap" style="display:none">
+  <div class="qcard">
+    <div style="text-align:center"><div class="section-tag" id="sectionTag">Section 1 — 3 pts</div></div>
+    <div class="q-counter" id="qCounter">Question 1 of 24</div>
+    <div class="q-text-en" id="qTextEn"></div>
+    <div class="q-text-ar" id="qTextAr"></div>
+    <div class="q-fig" id="qFig"></div>
+    <div class="opts-grid" id="optsGrid"></div>
+    <div class="feedback" id="feedback"></div>
+  </div>
+</div>
+
+<!-- NAV BUTTONS -->
+<div class="nav-wrap" id="navWrap" style="display:none">
+  <button class="nav-btn btn-prev" id="btnPrev" onclick="prevQ()">&#8592; Previous</button>
+  <button class="nav-btn btn-next" id="btnNext" onclick="nextQ()">Next &#8594;</button>
+</div>
+
+<!-- RESULT SCREEN -->
+<div class="result-screen" id="resultScreen">
+  <div class="result-card">
+    <div class="result-trophy" id="trophy">🏆</div>
+    <div class="result-score" id="resultScore"></div>
+    <div class="result-msg" id="resultMsg"></div>
+    <div class="result-grid">
+      <div class="result-box"><div class="result-box-n" id="r1">—</div><div class="result-box-l">Section 1 (×3)</div></div>
+      <div class="result-box"><div class="result-box-n" id="r2">—</div><div class="result-box-l">Section 2 (×4)</div></div>
+      <div class="result-box"><div class="result-box-n" id="r3">—</div><div class="result-box-l">Section 3 (×5)</div></div>
+    </div>
+    <button class="btn-retry" onclick="retryExam()">🔄 Try Again / حاول مجدداً</button>
+  </div>
+</div>
+
+<script>
+const IMGS = {"q1": "https://i.postimg.cc/441hxvmz/Screenshot-2026-05-01-134844.png", "q2": "https://i.postimg.cc/7ZJ60SZx/Screenshot-2026-05-01-135034.png", "q2a": "https://i.postimg.cc/fRvwx5Qp/Screenshot-2026-05-01-135516.png", "q2b": "https://i.postimg.cc/QC5DVJqB/Screenshot-2026-05-01-135537.png", "q2c": "https://i.postimg.cc/P5KjLx1K/Screenshot-2026-05-01-135607.png", "q2d": "https://i.postimg.cc/7hgvqYxc/Screenshot-2026-05-01-135643.png", "q2e": "https://i.postimg.cc/L4jGY5pP/Screenshot-2026-05-01-135723.png", "q3a": "https://i.postimg.cc/63MtKjzv/Screenshot-2026-05-02-064137.png", "q3b": "https://i.postimg.cc/qq9fB9KJ/Screenshot-2026-05-02-064213.png", "q3c": "https://i.postimg.cc/4x1Jwxtr/Screenshot-2026-05-02-064221.png", "q3d": "https://i.postimg.cc/4N6ZNx83/Screenshot-2026-05-02-064230.png", "q3e": "https://i.postimg.cc/sxpFXT4W/Screenshot-2026-05-02-064237.png", "q4": "https://i.postimg.cc/Nf4Vz9J0/Screenshot-2026-05-02-064455.png", "q4a": "https://i.postimg.cc/760tMfGF/Screenshot-2026-05-02-064532.png", "q4b": "https://i.postimg.cc/D0hjCn1M/Screenshot-2026-05-02-064537.png", "q4c": "https://i.postimg.cc/L4k0JgMB/Screenshot-2026-05-02-064544.png", "q4d": "https://i.postimg.cc/Wb2YgpNd/Screenshot-2026-05-02-064550.png", "q4e": "https://i.postimg.cc/g2jMtMLv/Screenshot-2026-05-02-064555.png", "q5a": "https://i.postimg.cc/zvpj0WzD/Screenshot-2026-05-02-064821.png", "q5b": "https://i.postimg.cc/Kc5JGXnq/Screenshot-2026-05-02-064827.png", "q5c": "https://i.postimg.cc/tRz2q03Q/Screenshot-2026-05-02-064834.png", "q5d": "https://i.postimg.cc/pXXky0Cb/Screenshot-2026-05-02-064842.png", "q5e": "https://i.postimg.cc/WbbSt98d/Screenshot-2026-05-02-064848.png", "q6": "https://i.postimg.cc/jdcx4jyp/Screenshot-2026-05-02-065239.png", "q7": "https://i.postimg.cc/Cx6w96P8/Screenshot-2026-05-02-065249.png", "q8": "https://i.postimg.cc/Sscq2QyQ/Screenshot-2026-05-02-065256.png", "q9": "https://i.postimg.cc/Bbs3xW6p/Screenshot-2026-05-02-065304.png", "q10": "https://i.postimg.cc/KjFbnXjS/Screenshot-2026-05-02-065312.png", "q11": "https://i.postimg.cc/Y2fMtSD9/Screenshot-2026-05-02-065319.png", "q12": "https://i.postimg.cc/vHYMTdCB/Screenshot-2026-05-02-065328.png", "q13": "https://i.postimg.cc/wTj8HQsm/Screenshot-2026-05-02-065653.png", "q14": "https://i.postimg.cc/NfMVZGW7/Screenshot-2026-05-02-065803.png", "q14a": "https://i.postimg.cc/CLQt0T0F/Screenshot-2026-05-02-065810.png", "q14b": "https://i.postimg.cc/7YWc484h/Screenshot-2026-05-02-065818.png", "q14c": "https://i.postimg.cc/3x0qJSrD/Screenshot-2026-05-02-065838.png", "q14d": "https://i.postimg.cc/yNqbJmWF/Screenshot-2026-05-02-065845.png", "q14e": "https://i.postimg.cc/DzVMWrmD/Screenshot-2026-05-02-065852.png", "q15": "https://i.postimg.cc/Gp05BF9W/Screenshot-2026-05-02-065902.png", "q16": "https://i.postimg.cc/tRSyscyb/Screenshot-2026-05-02-070643.png", "q16a": "https://i.postimg.cc/tgjH0Qd9/Screenshot-2026-05-02-070651.png", "q16b": "https://i.postimg.cc/d0jcwHnZ/Screenshot-2026-05-02-070700.png", "q16c": "https://i.postimg.cc/Jn7VnNdT/Screenshot-2026-05-02-070707.png", "q16d": "https://i.postimg.cc/Jn7VnNdT/Screenshot-2026-05-02-070707.png", "q16e": "https://i.postimg.cc/brd70zPT/Screenshot-2026-05-02-070724.png", "q17": "https://i.postimg.cc/Bn5VK8DF/Screenshot-2026-05-02-071013.png", "q17a": "https://i.postimg.cc/MGWrbWb9/Screenshot-2026-05-02-071024.png", "q17b": "https://i.postimg.cc/XvQ1sTQP/Screenshot-2026-05-02-071032.png", "q17c": "https://i.postimg.cc/85YKSL8j/Screenshot-2026-05-02-071039.png", "q17d": "https://i.postimg.cc/zBQtrTmT/Screenshot-2026-05-02-071045.png", "q17e": "https://i.postimg.cc/V6hG8XyH/Screenshot-2026-05-02-071053.png", "q18a": "https://i.postimg.cc/kgwLH65F/Screenshot-2026-05-02-071331.png", "q18b": "https://i.postimg.cc/htMNYzGs/Screenshot-2026-05-02-071339.png", "q18c": "https://i.postimg.cc/6Q3FxW7m/Screenshot-2026-05-02-071346.png", "q18d": "https://i.postimg.cc/HLxF1YcY/Screenshot-2026-05-02-071355.png", "q18e": "https://i.postimg.cc/VN62PfrJ/Screenshot-2026-05-02-071414.png", "q19": "https://i.postimg.cc/NGTScPMr/Screenshot-2026-05-02-071828.png", "q20": "https://i.postimg.cc/cJrk5F2K/Screenshot-2026-05-02-071903.png", "q20a": "https://i.postimg.cc/fbpq4xQd/Screenshot-2026-05-02-071912.png", "q20b": "https://i.postimg.cc/MGN3kyJr/Screenshot-2026-05-02-071920.png", "q20c": "https://i.postimg.cc/ydRQ7kVz/Screenshot-2026-05-02-071927.png", "q20d": "https://i.postimg.cc/pTjGPp2V/Screenshot-2026-05-02-071932.png", "q20e": "https://i.postimg.cc/nrtdrpzL/Screenshot-2026-05-02-071939.png", "q22": "https://i.postimg.cc/8z3msNX8/Screenshot-2026-05-02-072202.png", "q22a": "https://i.postimg.cc/W4k6kCxJ/Screenshot-2026-05-02-072207.png", "q22b": "https://i.postimg.cc/5tCqCTD7/Screenshot-2026-05-02-072212.png", "q22c": "https://i.postimg.cc/8c1hx5cv/Screenshot-2026-05-02-072218.png", "q22d": "https://i.postimg.cc/3NnghT0z/Screenshot-2026-05-02-072225.png", "q22e": "https://i.postimg.cc/NFp1tcrs/Screenshot-2026-05-02-072235.png", "q23": "https://i.postimg.cc/kG1tZvkr/Screenshot-2026-05-02-072522.png"};
+const Qs   = [{"n": 1, "pts": 3, "en": "How many circles are there in the figure?", "ar": "كم عدد الدوائر في الشكل؟", "fig": "q1", "opts": [{"t": "5"}, {"t": "6"}, {"t": "7"}, {"t": "8"}, {"t": "9"}], "ans": 3, "exp": "8 circles: 2 blue ears + 2 green inner circles + 1 yellow face + 2 orange eyes + 1 purple nose = 8."}, {"n": 2, "pts": 3, "en": "The picture shows 5 cubes viewed from the front. What is the view from above?", "ar": "تُظهر الصورة 5 مكعبات كما تبدو من الأمام. كيف يبدو الشكل من الأعلى؟", "fig": "q2", "opts": [{"img": "q2a"}, {"img": "q2b"}, {"img": "q2c"}, {"img": "q2d"}, {"img": "q2e"}], "ans": 1, "exp": "From above: 3 squares in a row — red, yellow, blue. Answer: B."}, {"n": 3, "pts": 3, "en": "Each bowl contains four numbered balls. In which bowl is the sum of all numbers largest?", "ar": "يحتوي كل وعاء على أربع كرات مرقمة. في أي وعاء يكون مجموع الأرقام هو الأكبر؟", "fig": null, "opts": [{"img": "q3a"}, {"img": "q3b"}, {"img": "q3c"}, {"img": "q3d"}, {"img": "q3e"}], "ans": 0, "exp": "Bowl A: 8+7+4+9 = 28, the largest sum."}, {"n": 4, "pts": 3, "en": "Mr. Beaver rearranges the pieces to make a kangaroo figure. Which piece is missing?", "ar": "يقوم السيد بيفر بإعادة ترتيب القطع لصنع شكل كنغر. أي قطعة مفقودة؟", "fig": "q4", "opts": [{"img": "q4a"}, {"img": "q4b"}, {"img": "q4c"}, {"img": "q4d"}, {"img": "q4e"}], "ans": 0, "exp": "The missing piece is option A."}, {"n": 5, "pts": 3, "en": "My boat has more than 1 circle and 2 more triangles than squares. Which boat is mine?", "ar": "قاربي يحتوي على أكثر من دائرة واحدة ومثلثين أكثر من عدد المربعات. أي قارب هو قاربي؟", "fig": null, "opts": [{"img": "q5a"}, {"img": "q5b"}, {"img": "q5c"}, {"img": "q5d"}, {"img": "q5e"}], "ans": 4, "exp": "Boat E matches: more than 1 circle and 2 more triangles than squares."}, {"n": 6, "pts": 3, "en": "This is my grandfather's birthday cake. Large candle = 10 years, small candle = 1 year. How old is my grandfather?", "ar": "هذه كعكة عيد ميلاد جدي. الشمعة الكبيرة = 10 سنوات، الصغيرة = سنة واحدة. كم عمر جدي؟", "fig": "q6", "opts": [{"t": "65"}, {"t": "66"}, {"t": "76"}, {"t": "77"}, {"t": "78"}], "ans": 2, "exp": "Count the candles: 7 large (70) + 6 small (6) = 76 years."}, {"n": 7, "pts": 3, "en": "Pablo puts 10 toy cars on this racetrack. How many cars are in the tunnel?", "ar": "يضع خالد 10 سيارات لعب على هذا المسار. كم عدد السيارات الموجودة في النفق؟", "fig": "q7", "opts": [{"t": "5"}, {"t": "6"}, {"t": "7"}, {"t": "8"}, {"t": "9"}], "ans": 1, "exp": "6 cars are inside the tunnel."}, {"n": 8, "pts": 3, "en": "Steven drives from X to Y. At each crossing he stops before going straight ahead. How many times does he stop?", "ar": "يقود ستيفن من X إلى Y. في كل تقاطع يتوقف قبل التقدم للأمام. كم مرة يتوقف؟", "fig": "q8", "opts": [{"t": "11"}, {"t": "12"}, {"t": "13"}, {"t": "14"}, {"t": "15"}], "ans": 3, "exp": "Counting all crossings along the spiral path = 14 stops."}, {"n": 9, "pts": 4, "en": "There are 5 trees in a park. A beaver can see only 2 trees (others hidden). At which marked point is the beaver standing?", "ar": "هناك 5 أشجار في الحديقة. يمكن للقندس رؤية شجرتين فقط. عند أي نقطة يقف القندس؟", "fig": "q9", "opts": [{"t": "A"}, {"t": "B"}, {"t": "C"}, {"t": "D"}, {"t": "E"}], "ans": 3, "exp": "From point D the beaver can see exactly 2 trees; the other 3 are hidden."}, {"n": 10, "pts": 4, "en": "There are 24 squares. Suchit coloured some. How many more need to be coloured so that half are coloured?", "ar": "هناك 24 مربعاً. قام إبراهيم بتلوين بعضها. كم عدد المربعات الإضافية التي يجب تلوينها حتى يصبح نصفها ملوناً؟", "fig": "q10", "opts": [{"t": "1"}, {"t": "2"}, {"t": "3"}, {"t": "4"}, {"t": "5"}], "ans": 2, "exp": "Half of 24 = 12. Currently 9 are coloured. 12 − 9 = 3 more needed."}, {"n": 11, "pts": 4, "en": "The two tokens with ? have the same number. What is each missing number so that the sum is 18?", "ar": "القطعتان اللتان تحملان علامة الاستفهام لهما نفس الرقم. ما هو الرقم المفقود بحيث يكون المجموع 18؟", "fig": "q11", "opts": [{"t": "1"}, {"t": "2"}, {"t": "3"}, {"t": "4"}, {"t": "5"}], "ans": 2, "exp": "10 + ? + ? + 2 = 18 → each ? = 3."}, {"n": 12, "pts": 4, "en": "Raha wants to finish the bee. She needs points to unlock parts. How many points does she need?", "ar": "تريد رها إكمال النحلة. تحتاج إلى نقاط لفتح أجزاء النحلة. كم عدد النقاط التي تحتاجها؟", "fig": "q12", "opts": [{"t": "9"}, {"t": "10"}, {"t": "11"}, {"t": "12"}, {"t": "13"}], "ans": 4, "exp": "Total points needed to unlock the missing bee parts = 13."}, {"n": 13, "pts": 4, "en": "The table has 30 boxes. After painting row 3, row 6, column C, and column D, how many boxes will NOT be painted?", "ar": "يحتوي الجدول على 30 مربعاً. بعد تلوين الصف 3، الصف 6، العمود C، والعمود D، كم عدد المربعات التي لن تُلوَّن؟", "fig": "q13", "opts": [{"t": "8"}, {"t": "10"}, {"t": "12"}, {"t": "18"}, {"t": "22"}], "ans": 2, "exp": "18 boxes painted. 30 − 18 = 12 not painted."}, {"n": 14, "pts": 4, "en": "A sheet of paper is folded in half. Square and round holes are punched. How does it look unfolded?", "ar": "يتم طي ورقة إلى النصف ثم ثقبها. كيف ستبدو الورقة بعد فتحها مرة أخرى؟", "fig": "q14", "opts": [{"img": "q14a"}, {"img": "q14b"}, {"img": "q14c"}, {"img": "q14d"}, {"img": "q14e"}], "ans": 1, "exp": "When unfolded, holes mirror across the fold line. Answer: B."}, {"n": 15, "pts": 4, "en": "A student made a shape using 12 cubes, putting one drop of glue between any two cubes sharing a face. How many drops?", "ar": "قام طالب بصنع الشكل باستخدام 12 مكعباً ووضع قطرة غراء بين أي مكعبين يشتركان في وجه مشترك. كم عدد القطرات؟", "fig": "q15", "opts": [{"t": "8"}, {"t": "9"}, {"t": "10"}, {"t": "11"}, {"t": "12"}], "ans": 3, "exp": "The shape has 11 shared faces between adjacent cubes = 11 drops of glue."}, {"n": 16, "pts": 4, "en": "Max wants to complete the puzzle. He has 5 different pieces. Which pieces does he have to use?", "ar": "يريد ماكس إكمال اللغز. لديه 5 قطع مختلفة. أي قطع يجب أن يستخدمها؟", "fig": "q16", "opts": [{"img": "q16a"}, {"img": "q16b"}, {"img": "q16c"}, {"img": "q16d"}, {"img": "q16e"}], "ans": 0, "exp": "The combination of pieces in option A fills all remaining white squares exactly."}, {"n": 17, "pts": 5, "en": "Elvis has 6 identical triangles like ▽. Which of the following pictures can he make?", "ar": "إلفيس لديه 6 مثلثات متطابقة مثل هذه ▽. أي من الصور التالية يمكنه صنعها؟", "fig": "q17", "opts": [{"img": "q17a"}, {"img": "q17b"}, {"img": "q17c"}, {"img": "q17d"}, {"img": "q17e"}], "ans": 0, "exp": "6 identical triangles form the shape in option A."}, {"n": 18, "pts": 5, "en": "Five children share a birthday. Lea is 2 years older than Jose but 1 year younger than Ali. Vittorio is the youngest. Which is Sarah's cake?", "ar": "يحتفل خمسة أطفال بعيد ميلادهم. ليا تكبر خوسيه بسنتين لكنها أصغر من علي بسنة. فيتوريو هو الأصغر. أي كعكة تخص سارة؟", "fig": null, "opts": [{"img": "q18a"}, {"img": "q18b"}, {"img": "q18c"}, {"img": "q18d"}, {"img": "q18e"}], "ans": 2, "exp": "Ages: Vittorio(4), Jose(5), Sarah(6), Lea(7), Ali(8). Sarah's cake = 6 candles — C."}, {"n": 19, "pts": 5, "en": "The map shows 5 villages with distances. Only two villages are the same distance apart no matter which route. Which two?", "ar": "تُظهر الخريطة خمس قرى والمسافات بينها. هناك قريتان فقط بينهما نفس المسافة بغض النظر عن الطريق. ما هما؟", "fig": "q19", "opts": [{"t": "B and E"}, {"t": "B and D"}, {"t": "C and E"}, {"t": "A and C"}, {"t": "A and D"}], "ans": 0, "exp": "B→A→E = 7+5=12 km = B→C→D→E = 2+6+4=12 km. Answer: B and E."}, {"n": 20, "pts": 5, "en": "Sam walks through a two-storey maze from entrance to exit (both floor 1). In what order will she find the wall stickers?", "ar": "تمشي سام عبر متاهة من طابقين من المدخل إلى المخرج. بأي ترتيب ستجد ملصقات الحائط؟", "fig": "q20", "opts": [{"img": "q20a"}, {"img": "q20b"}, {"img": "q20c"}, {"img": "q20d"}, {"img": "q20e"}], "ans": 1, "exp": "Sam finds the stickers in the order shown in option B."}, {"n": 21, "pts": 5, "en": "Emma finished 3rd in a dance competition. There were 3 dancers between her and last place. How many dancers total?", "ar": "أنهت إيما في المركز الثالث في مسابقة رقص. كان هناك ثلاثة راقصين بين إيما والمركز الأخير. كم عدد الراقصين الكلي؟", "fig": null, "opts": [{"t": "4"}, {"t": "5"}, {"t": "6"}, {"t": "7"}, {"t": "8"}], "ans": 3, "exp": "Emma=3rd, 3 between her and last, last=7th. Total = 7 dancers."}, {"n": 22, "pts": 5, "en": "Malik places one of the five pieces on the grid (no rotating/flipping). Which piece covers the largest sum?", "ar": "يضع مالك إحدى القطع الخمس على الشبكة (بدون تدوير أو قلب). أي قطعة تغطي الأرقام ذات المجموع الأكبر؟", "fig": "q22", "opts": [{"img": "q22a"}, {"img": "q22b"}, {"img": "q22c"}, {"img": "q22d"}, {"img": "q22e"}], "ans": 4, "exp": "Piece E covers the numbers with the largest sum."}, {"n": 23, "pts": 5, "en": "Maria has 19 apples in 3 bags. She takes the same number from each. Now bags have 3, 4, and 6 apples. How many did she take from each?", "ar": "لدى ماريا 19 تفاحة في 3 أكياس. أخذت من كل كيس نفس العدد. الآن الأكياس تحتوي على 3 و4 و6 تفاحات. كم أخذت من كل كيس؟", "fig": "q23", "opts": [{"t": "1"}, {"t": "2"}, {"t": "3"}, {"t": "4"}, {"t": "5"}], "ans": 1, "exp": "19 − (3+4+6) = 6 taken total. 6 ÷ 3 = 2 from each bag."}, {"n": 24, "pts": 5, "en": "Three frogs: one sang 2 times in 9 nights, another listened to 5 songs. How many songs did the third frog listen to?", "ar": "ثلاثة ضفادع: غنى أحدها مرتين في 9 ليالٍ، واستمع آخر إلى 5 أغنيات. كم أغنية استمع إليها الضفدع الثالث؟", "fig": null, "opts": [{"t": "7"}, {"t": "6"}, {"t": "5"}, {"t": "4"}, {"t": "3"}], "ans": 1, "exp": "9×2=18 total listens. Frog1 sang 2× → listened 7×. Frog2 heard 5. Frog3=18−7−5=6."}];
+
+const SECTIONS = {
+  1:{tag:'Section 1 — 3 pts',ar:'القسم الأول — 3 نقاط'},
+  2:{tag:'Section 2 — 4 pts',ar:'القسم الثاني — 4 نقاط'},
+  3:{tag:'Section 3 — 5 pts',ar:'القسم الثالث — 5 نقاط'},
+};
+
+function secNum(n){ return n<=8?1:n<=16?2:3; }
+
+let cur=0, state={}, correct=0, wrong=0;
+
+function startExam(){
+  document.getElementById('startScreen').style.display='none';
+  document.getElementById('statsWrap').style.display='block';
+  document.getElementById('progWrap').style.display='block';
+  document.getElementById('qcardWrap').style.display='block';
+  document.getElementById('navWrap').style.display='flex';
+  renderQ();
+}
+
+function renderQ(){
+  const q = Qs[cur];
+  const n = q.n;
+  const sec = secNum(n);
+  const answered = state[n] !== undefined;
+
+  // section tag
+  document.getElementById('sectionTag').textContent = SECTIONS[sec].tag;
+  document.getElementById('qCounter').textContent = 'Question '+n+' of 24 — '+SECTIONS[sec].ar;
+
+  // question text
+  document.getElementById('qTextEn').textContent = q.en;
+  document.getElementById('qTextAr').textContent = q.ar;
+
+  // figure
+  const figEl = document.getElementById('qFig');
+  if(q.fig && IMGS[q.fig]){
+    figEl.innerHTML = '<img src="'+IMGS[q.fig]+'" alt="figure">';
+    figEl.style.display='block';
+  } else {
+    figEl.innerHTML='';
+    figEl.style.display='none';
+  }
+
+  // options
+  const grid = document.getElementById('optsGrid');
+  grid.innerHTML='';
+  // 5 options: show as 2+2+1 or 2+3 — use 2-col grid, last item spans if odd
+  q.opts.forEach((opt,i)=>{
+    const btn = document.createElement('button');
+    btn.className='opt-btn';
+    btn.id='opt-'+i;
+    btn.disabled = answered;
+
+    if(opt.img && IMGS[opt.img]){
+      const im = document.createElement('img');
+      im.src = IMGS[opt.img];
+      im.className='lbl-img';
+      im.alt = String.fromCharCode(65+i);
+      const wrap=document.createElement('div');
+      wrap.style.cssText='display:flex;flex-direction:column;align-items:center;gap:4px;width:100%';
+      const lbl=document.createElement('div');
+      lbl.className='lbl';lbl.style.fontSize='13px';lbl.textContent=String.fromCharCode(65+i);
+      wrap.appendChild(lbl);wrap.appendChild(im);
+      btn.appendChild(wrap);
+    } else {
+      const lbl=document.createElement('div');
+      lbl.className='lbl';
+      lbl.textContent = String.fromCharCode(65+i)+'.  '+opt.t;
+      btn.appendChild(lbl);
+    }
+
+    // if 5th option, span full width
+    if(i===4) btn.style.gridColumn='1/-1';
+
+    if(answered){
+      if(i===q.ans) btn.classList.add('correct');
+      else if(i===state[n]) btn.classList.add('wrong');
+    } else {
+      btn.onclick=()=>pickAns(q,i);
+    }
+    grid.appendChild(btn);
+  });
+
+  // feedback
+  const fb = document.getElementById('feedback');
+  if(answered){
+    if(state[n]===q.ans){
+      fb.textContent='✅ Correct! صحيح — '+q.exp;
+      fb.className='feedback ok';
+    } else {
+      fb.textContent='❌ Wrong! خطأ — '+q.exp;
+      fb.className='feedback no';
+    }
+  } else {
+    fb.className='feedback';
+  }
+
+  // progress
+  const pct = Math.round((Object.keys(state).length)/24*100);
+  document.getElementById('progFill').style.width=pct+'%';
+
+  // stats
+  document.getElementById('statQ').textContent='سؤال: '+n+'/24';
+  document.getElementById('statW').textContent='خطأ: '+wrong;
+  document.getElementById('statR').textContent='صح: '+correct;
+
+  // nav
+  document.getElementById('btnPrev').style.opacity = cur===0?'0.3':'1';
+  document.getElementById('btnPrev').disabled = cur===0;
+  document.getElementById('btnNext').textContent = cur===23? '🏁 Finish / إنهاء' : 'Next ➔';
+}
+
+function pickAns(q,chosen){
+  if(state[q.n]!==undefined) return;
+  state[q.n]=chosen;
+  if(chosen===q.ans) correct++; else wrong++;
+  renderQ();
+  // auto-advance after 1.8s
+  setTimeout(()=>{ if(cur<23){ cur++; renderQ(); } else { showResult(); } }, 1800);
+}
+
+function nextQ(){
+  if(cur<23){ cur++; renderQ(); }
+  else{ showResult(); }
+}
+
+function prevQ(){
+  if(cur>0){ cur--; renderQ(); }
+}
+
+function showResult(){
+  document.getElementById('qcardWrap').style.display='none';
+  document.getElementById('navWrap').style.display='none';
+  document.getElementById('statsWrap').style.display='none';
+  document.getElementById('progWrap').style.display='none';
+
+  let pts=0,s1=0,s2=0,s3=0;
+  Qs.forEach(q=>{
+    if(state[q.n]===q.ans){
+      pts+=q.pts;
+      if(q.n<=8)s1++; else if(q.n<=16)s2++; else s3++;
+    }
+  });
+
+  const pct=Math.round(correct/24*100);
+  document.getElementById('trophy').textContent = pct>=80?'🏆':pct>=60?'🥈':pct>=40?'🥉':'⭐';
+  document.getElementById('resultScore').textContent=pts+' / 96 pts';
+  document.getElementById('resultMsg').textContent=correct+' correct out of 24 ('+pct+'%)';
+  document.getElementById('r1').textContent=s1+'/8 = '+(s1*3)+'pts';
+  document.getElementById('r2').textContent=s2+'/8 = '+(s2*4)+'pts';
+  document.getElementById('r3').textContent=s3+'/8 = '+(s3*5)+'pts';
+  document.getElementById('resultScreen').style.display='block';
+}
+
+function retryExam(){
+  cur=0; state={}; correct=0; wrong=0;
+  document.getElementById('resultScreen').style.display='none';
+  document.getElementById('statsWrap').style.display='block';
+  document.getElementById('progWrap').style.display='block';
+  document.getElementById('qcardWrap').style.display='block';
+  document.getElementById('navWrap').style.display='flex';
+  renderQ();
+}
+</script>
+</body>
+</html>
